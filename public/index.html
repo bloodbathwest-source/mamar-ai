@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAMAR.AI - Matrix AI Machine Agents Rebel</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="matrix-bg" id="matrix"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <h1 class="glitch" data-text="MAMAR.AI">MAMAR.AI</h1>
+                <p class="subtitle">Matrix AI Machine Agents Rebel</p>
+            </div>
+            <div class="status">
+                <span class="status-indicator" id="status">●</span>
+                <span class="status-text">ONLINE</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="terminal">
+                <div class="terminal-header">
+                    <span class="terminal-title">// MAMAR TERMINAL v1.0</span>
+                    <div class="terminal-controls">
+                        <span class="control minimize">━</span>
+                        <span class="control maximize">□</span>
+                        <span class="control close">✕</span>
+                    </div>
+                </div>
+                
+                <div class="chat-container" id="chatContainer">
+                    <div class="message system">
+                        <span class="prompt">SYSTEM:</span>
+                        <span class="text">Welcome to MAMAR.AI. Cyberpunk AI ready to hack the web.</span>
+                    </div>
+                    <div class="message system">
+                        <span class="prompt">SYSTEM:</span>
+                        <span class="text">AI Models: Grok, GPT-4o, Claude | Web Scraping: ENABLED</span>
+                    </div>
+                </div>
+
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <span class="input-prompt">root@mamar:~$</span>
+                        <input 
+                            type="text" 
+                            id="messageInput" 
+                            class="message-input" 
+                            placeholder="Enter your command..."
+                            autocomplete="off"
+                        >
+                    </div>
+                    <button id="sendButton" class="send-button">EXECUTE</button>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="panel">
+                    <h3>AI MODELS</h3>
+                    <div class="model-selector">
+                        <label class="model-option">
+                            <input type="radio" name="model" value="auto" checked>
+                            <span>AUTO SELECT</span>
+                        </label>
+                        <label class="model-option">
+                            <input type="radio" name="model" value="grok">
+                            <span>GROK (xAI)</span>
+                        </label>
+                        <label class="model-option">
+                            <input type="radio" name="model" value="gpt-4o">
+                            <span>GPT-4o (OpenAI)</span>
+                        </label>
+                        <label class="model-option">
+                            <input type="radio" name="model" value="claude">
+                            <span>CLAUDE (Anthropic)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>SYSTEM INFO</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">STATUS:</span>
+                            <span class="info-value" id="systemStatus">ACTIVE</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">UPTIME:</span>
+                            <span class="info-value" id="uptime">00:00:00</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">QUERIES:</span>
+                            <span class="info-value" id="queryCount">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>QUICK COMMANDS</h3>
+                    <div class="quick-commands">
+                        <button class="quick-cmd" data-cmd="What can you do?">CAPABILITIES</button>
+                        <button class="quick-cmd" data-cmd="Show me the latest AI news">LATEST NEWS</button>
+                        <button class="quick-cmd" data-cmd="Explain quantum computing">TECH QUERY</button>
+                        <button class="quick-cmd" data-cmd="Help me with coding">CODE HELP</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>MAMAR.AI © 2025 | <a href="https://mamar.ai" target="_blank">mamar.ai</a> | Powered by Grok, GPT-4o, Claude</p>
+        </footer>
+    </div>
+
+    <script src="/script.js"></script>
+</body>
+</html>
