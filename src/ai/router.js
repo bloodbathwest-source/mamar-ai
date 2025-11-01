@@ -36,10 +36,12 @@ export class AIRouter {
   async chat(message, preferredModel = null, context = null) {
     const model = preferredModel || this.defaultModel;
     
-    // Enhance message with scraped context if available
+    // Sanitize and limit context to prevent injection
     let enhancedMessage = message;
     if (context) {
-      enhancedMessage = `Context from web: ${JSON.stringify(context)}\n\nUser query: ${message}`;
+      // Limit context size and sanitize
+      const sanitizedContext = JSON.stringify(context).substring(0, 2000);
+      enhancedMessage = `Context from web: ${sanitizedContext}\n\nUser query: ${message}`;
     }
 
     try {

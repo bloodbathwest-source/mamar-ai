@@ -73,10 +73,17 @@ function addMessage(type, text, model = null) {
     else if (type === 'ai') prompt = model ? `MAMAR.AI [${model.toUpperCase()}]:` : 'MAMAR.AI:';
     else if (type === 'system') prompt = 'SYSTEM:';
     
-    messageDiv.innerHTML = `
-        <span class="prompt">${prompt}</span>
-        <span class="text">${text}</span>
-    `;
+    // Create elements safely to prevent XSS
+    const promptSpan = document.createElement('span');
+    promptSpan.className = 'prompt';
+    promptSpan.textContent = prompt;
+    
+    const textSpan = document.createElement('span');
+    textSpan.className = 'text';
+    textSpan.textContent = text;
+    
+    messageDiv.appendChild(promptSpan);
+    messageDiv.appendChild(textSpan);
     
     chatContainer.appendChild(messageDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
