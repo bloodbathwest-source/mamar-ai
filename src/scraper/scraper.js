@@ -1,6 +1,14 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
+// Configuration constants
+const SCRAPER_LIMITS = {
+  HEADINGS: 10,
+  PARAGRAPHS: 10,
+  LINKS: 20,
+  IMAGES: 10
+};
+
 export class WebScraper {
   constructor() {
     this.timeout = parseInt(process.env.SCRAPER_TIMEOUT) || 30000;
@@ -34,14 +42,14 @@ export class WebScraper {
 
       // Extract headings
       $('h1, h2, h3').each((i, elem) => {
-        if (i < 10) { // Limit to first 10 headings
+        if (i < SCRAPER_LIMITS.HEADINGS) {
           data.headings.push($(elem).text().trim());
         }
       });
 
       // Extract paragraphs
       $('p').each((i, elem) => {
-        if (i < 10) { // Limit to first 10 paragraphs
+        if (i < SCRAPER_LIMITS.PARAGRAPHS) {
           const text = $(elem).text().trim();
           if (text.length > 20) {
             data.paragraphs.push(text);
@@ -51,7 +59,7 @@ export class WebScraper {
 
       // Extract links
       $('a[href]').each((i, elem) => {
-        if (i < 20) { // Limit to first 20 links
+        if (i < SCRAPER_LIMITS.LINKS) {
           const href = $(elem).attr('href');
           const text = $(elem).text().trim();
           if (href && text) {
@@ -62,7 +70,7 @@ export class WebScraper {
 
       // Extract images
       $('img[src]').each((i, elem) => {
-        if (i < 10) { // Limit to first 10 images
+        if (i < SCRAPER_LIMITS.IMAGES) {
           const src = $(elem).attr('src');
           const alt = $(elem).attr('alt') || '';
           if (src) {
@@ -96,27 +104,23 @@ export class WebScraper {
   }
 
   async extractText(url) {
-    try {
-      const data = await this.scrape(url);
-      
-      // Combine all text content
-      let text = `Title: ${data.title}\n\n`;
-      
-      if (data.description) {
-        text += `Description: ${data.description}\n\n`;
-      }
-      
-      if (data.headings.length > 0) {
-        text += `Headings:\n${data.headings.join('\n')}\n\n`;
-      }
-      
-      if (data.paragraphs.length > 0) {
-        text += `Content:\n${data.paragraphs.join('\n\n')}`;
-      }
-      
-      return text;
-    } catch (error) {
-      throw error;
+    const data = await this.scrape(url);
+    
+    // Combine all text content
+    let text = `Title: ${data.title}\n\n`;
+    
+    if (data.description) {
+      text += `Description: ${data.description}\n\n`;
     }
+    
+    if (data.headings.length > 0) {
+      text += `Headings:\n${data.headings.join('\n')}\n\n`;
+    }
+    
+    if (data.paragraphs.length > 0) {
+      text += `Content:\n${data.paragraphs.join('\n\n')}`;
+    }
+    
+    return text;
   }
 }

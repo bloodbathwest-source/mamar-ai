@@ -10,8 +10,8 @@ function createMatrixEffect() {
 
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
     const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
+    let columns = Math.floor(canvas.width / fontSize);
+    let drops = Array(columns).fill(1);
 
     function draw() {
         ctx.fillStyle = 'rgba(5, 8, 20, 0.05)';
@@ -36,6 +36,9 @@ function createMatrixEffect() {
     window.addEventListener('resize', () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        // Recalculate columns and drops array
+        columns = Math.floor(canvas.width / fontSize);
+        drops = Array(columns).fill(1);
     });
 }
 

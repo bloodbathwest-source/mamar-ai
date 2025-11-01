@@ -158,7 +158,18 @@ export class AIRouter {
       if (model === failedModel) continue;
       
       try {
-        return await this.chat(message, model);
+        // Call specific model method directly to avoid recursion
+        switch (model) {
+          case 'grok':
+            if (this.xai) return await this.chatWithGrok(message);
+            break;
+          case 'gpt-4o':
+            if (this.openai) return await this.chatWithGPT4o(message);
+            break;
+          case 'claude':
+            if (this.anthropic) return await this.chatWithClaude(message);
+            break;
+        }
       } catch (error) {
         console.error(`Fallback to ${model} failed:`, error.message);
       }
