@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAMAR — Matrix AI Machine Agents Rebel</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="frame">
+    <header>
+      <div class="logo">MAMAR</div>
+      <div class="tagline">Matrix AI Machine Agents Rebel</div>
+      <div class="header-right">
+        <span id="mode-badge" class="badge">…</span>
+        <button id="reset-btn" type="button" title="Forget this conversation">↺ reset</button>
+      </div>
+    </header>
+
+    <main id="messages" aria-live="polite"></main>
+
+    <div id="typing" class="typing hidden"><span></span><span></span><span></span></div>
+
+    <form id="composer">
+      <input id="input" type="text" placeholder="Talk to MAMAR…" autocomplete="off" autofocus>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

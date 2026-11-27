@@ -1,0 +1,68 @@
+# ============================================================
+#  MAMAR — secrets shield
+#  This repo is PUBLIC, and MAMAR is wired to five paid API
+#  services (Tavily, OpenAI, xAI, Anthropic, ElevenLabs).
+#  If a real API key is ever committed here, anyone on the
+#  internet can find it and spend Christian's money.
+#  This file makes git refuse the files where keys usually
+#  hide. It is a seatbelt, not a guarantee — always run the
+#  checks in EXPORT-SAFETY.md before committing an export.
+# ============================================================
+
+# Environment files — the classic home of API keys
+.env
+.env.*
+!.env.example
+*.env
+
+# Key / credential files of any flavour
+*.key
+*.pem
+*.p12
+*.pfx
+credentials
+credentials.*
+*credential*
+*secret*
+*secrets*
+*apikey*
+*api-key*
+*api_key*
+*token*
+
+# Platform settings exports that commonly carry keys
+# (Bubble / Base44 app exports themselves — bubble/export-*.json
+#  and base44/export-*.zip — are NOT ignored on purpose: they are
+#  the backup this repo exists to hold. Check them with
+#  EXPORT-SAFETY.md before committing.)
+**/settings.json
+**/api-settings.*
+**/platform-settings.*
+.bubble/
+.base44/
+
+# Local tooling noise
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# OS and editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*~
+
+# ---- Rebuild (Python) additions ----
+
+# MAMAR's conversation memory lives here — private chats, never commit
+data/
+
+# Python noise
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
