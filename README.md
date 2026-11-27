@@ -7,6 +7,8 @@
 
 ## QUICK START (No-Code)
 
+> **Status:** The `bubble/` and `base44/` export files are **not in this repo yet**, so steps 1–2 currently have nothing to import. Export the app from Bubble/Base44 first (see the workflow table below), save the files under `bubble/` and `base44/`, and commit them — then this Quick Start works as written.
+
 1. **Bubble** – Open [bubble.io](https://bubble.io), import `bubble/export-*.json`  
 2. **Base44** – Open [base44.com](https://base44.com), import `base44/export-*.zip`  
 3. Add API keys in **Settings → API** (Tavily, OpenAI, xAI Grok, Anthropic, ElevenLabs)  
@@ -28,3 +30,4 @@
 git add .
 git commit -m "Add voice mode + Grok alliance"
 git push origin main
+```
