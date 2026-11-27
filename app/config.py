@@ -12,13 +12,19 @@ from dataclasses import dataclass
 
 # Default API address + model per provider. OpenAI and xAI both speak the
 # same "OpenAI-compatible" chat API, so one adapter serves both — only
-# these two values change.
+# these two values change. Ollama speaks the same API too, but serves it
+# locally (on the user's own machine) instead of from a cloud.
 PROVIDER_DEFAULTS = {
     "openai": {"base_url": "https://api.openai.com/v1", "model": "gpt-4o-mini"},
     "xai": {"base_url": "https://api.x.ai/v1", "model": "grok-4"},
+    "ollama": {"base_url": "http://127.0.0.1:11434/v1", "model": "llama3.1:8b"},
 }
 
 LIVE_PROVIDERS = tuple(PROVIDER_DEFAULTS.keys())
+
+# Providers that need no API key — the brain runs on the user's own
+# machine, so there is nothing to authenticate against.
+KEYLESS_PROVIDERS = ("ollama",)
 
 
 @dataclass
@@ -30,8 +36,21 @@ class Settings:
 
     @property
     def live(self) -> bool:
-        """True when a real provider brain can run (provider + key set)."""
-        return self.provider in LIVE_PROVIDERS and bool(self.api_key)
+        """True when a real provider brain can run.
+
+        Cloud providers need an API key; a local provider (Ollama) needs
+        none — selecting it is the whole configuration.
+        """
+        if self.provider not in LIVE_PROVIDERS:
+            return False
+        if self.provider in KEYLESS_PROVIDERS:
+            return True
+        return bool(self.api_key)
+
+    @property
+    def local(self) -> bool:
+        """True when the brain runs on the user's own machine."""
+        return self.provider in KEYLESS_PROVIDERS
 
     @property
     def effective_base_url(self) -> str:

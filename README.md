@@ -18,9 +18,11 @@ stacked together. This rebuild copies that shape with open parts:
    tells the AI who it is. *This is the part in this repo, and it's the
    part that makes her MAMAR instead of a generic chatbot.*
 2. **The brain** — a big AI model (like GPT or Grok). Nobody sane trains
-   one of these at home; you **rent** it. Your server sends the
-   conversation to the provider's API and gets the reply back. Swap the
-   provider in one config file and she thinks with a different brain.
+   one of these at home; you **rent** it from a provider's API — or run
+   a free open model on your own machine (see *Run her brain locally*
+   below). Your server sends the conversation to the brain and gets the
+   reply back. Swap the provider in one config file and she thinks with
+   a different brain.
 3. **The persona** — `persona.md`. One editable text file, sent to the
    model with every conversation, that says who MAMAR is and how she
    talks. Edit the file, restart, new personality.
@@ -34,7 +36,7 @@ the brain is a subscription you can change.
 
 ```bash
 pip install -r requirements.txt
-cp .env.example .env        # then open .env and add your API key
+cp .env.example .env        # then open .env: add a cloud API key, or pick the local Ollama brain
 uvicorn app.main:app --reload
 ```
 
@@ -44,13 +46,14 @@ Open **http://127.0.0.1:8000** and talk to her.
 
 | Setting | What it does |
 |---|---|
-| `MAMAR_PROVIDER` | `openai`, `xai`, or `demo` |
-| `MAMAR_API_KEY` | Your key from that provider — the one thing that makes her real |
-| `MAMAR_MODEL` | Optional. Defaults: `gpt-4o-mini` (OpenAI), `grok-4` (xAI) |
+| `MAMAR_PROVIDER` | `openai`, `xai`, `ollama` (local), or `demo` |
+| `MAMAR_API_KEY` | Your key from that provider — the one thing that makes her real in the cloud. **Not needed for `ollama`.** |
+| `MAMAR_MODEL` | Optional. Defaults: `gpt-4o-mini` (OpenAI), `grok-4` (xAI), `llama3.1:8b` (Ollama) |
 | `MAMAR_BASE_URL` | Optional. Only for a different OpenAI-compatible host |
 
 OpenAI and xAI speak the same API dialect, so one adapter serves both —
 switching her brain from GPT to Grok is changing two lines in `.env`.
+Ollama speaks it too, from your own machine.
 
 > 🔑 **Your `.env` is gitignored and must stay that way.** This repo is
 > public; a committed key is a stolen key. See
@@ -58,19 +61,68 @@ switching her brain from GPT to Grok is changing two lines in `.env`.
 
 ### Demo mode
 
-No key? She still runs. Without an API key MAMAR answers with canned,
-in-character replies that are **clearly labelled `[DEMO MODE]`** and tell
-you a key is needed for real answers. She never fakes being a live model.
+No provider configured? She still runs. With no cloud API key and no
+local provider selected, MAMAR answers with canned, in-character replies
+that are **clearly labelled `[DEMO MODE]`** and tell you what would make
+her real. She never fakes being a live model — and if Ollama is selected
+but not running, she says that instead of quietly dropping into demo.
+
+---
+
+## Run her brain locally (free, offline) 🖥️
+
+The third option: no cloud, no key, no bills. [Ollama](https://ollama.com)
+runs open AI models on your own computer, and it speaks the same API
+dialect as OpenAI — so MAMAR talks to it through the same adapter, just
+pointed at your machine.
+
+1. **Install Ollama** from [ollama.com](https://ollama.com) (Windows,
+   macOS, Linux).
+2. **Download the model** (about 4.7 GB, one time):
+   ```bash
+   ollama pull llama3.1:8b
+   ```
+   `qwen2.5:7b` is a good alternative pick — same steps, swap the name.
+3. **Make sure Ollama is running** — open the Ollama app, or run
+   `ollama serve` in a terminal. It listens on
+   `http://127.0.0.1:11434`.
+4. **Point MAMAR at it** in `.env`:
+   ```
+   MAMAR_PROVIDER=ollama
+   MAMAR_MODEL=llama3.1:8b
+   ```
+   (No `MAMAR_API_KEY` — there is nothing to authenticate. The chat
+   page badge will read **LOCAL BRAIN (OLLAMA)**.)
+5. **Run MAMAR** as usual (`uvicorn app.main:app`) and talk to her.
+
+**Honest expectations.** An 8-billion-parameter local model is
+*noticeably* less capable than GPT/Claude-class cloud brains — shorter
+memory for nuance, weaker reasoning, the odd confident mistake. In
+exchange it runs **entirely on your machine**: no per-message cost, no
+API key, works with the Wi-Fi unplugged, and nothing you say leaves the
+house. Its filtering is only whatever the open model's makers baked in
+— there is no provider watching the conversation, because there is no
+provider. `llama3.1:8b` fits comfortably on a 16 GB RAM machine with a
+modern GPU (e.g. an RTX 5060 laptop).
+
+**Making the brain *hers*.** A stock open model is still a stranger
+wearing MAMAR's persona file. The future step is **fine-tuning**:
+training the open model on examples of how MAMAR should talk and what
+she should know, until the personality lives in the model itself rather
+than in a prompt. That is a project of its own — this local setup is
+the groundwork it builds on.
 
 ### A straight word about "uncensored"
 
 MAMAR's personality is hers — but what the *model* will and won't say is
-set by whichever provider supplies the brain, not by this code. Every
+set by whoever supplies the brain, not by this code. Every cloud
 provider draws its own lines, and they differ: of the providers MAMAR
 names, **xAI's Grok is generally the most permissive**, OpenAI and
 Anthropic are stricter, and none of them is limit-free. Picking a
 provider is picking a set of limits — the persona file controls her
-style, not their rules.
+style, not their rules. The **local Ollama brain** is the exception:
+the model runs on your own machine, so the only limits in play are the
+ones the open model's makers built into the model itself.
 
 ---
 
@@ -96,8 +148,9 @@ pytest
 ```
 
 Covers the health endpoint, demo-mode replies, persona loading, session
-memory (two turns remember context; reset forgets), and the adapter's
-request shape against a mocked provider.
+memory (two turns remember context; reset forgets), the adapter's
+request shape against a mocked provider, and the local Ollama brain
+(keyless selection, no auth header, friendly error when Ollama is down).
 
 ---
 

@@ -27,6 +27,8 @@ async function loadBadge() {
     if (data.mode === "demo") {
       badge.textContent = "DEMO MODE";
       badge.classList.add("demo");
+    } else if (data.brain === "local") {
+      badge.textContent = ("LOCAL BRAIN (OLLAMA) · " + (data.model || "")).toUpperCase();
     } else {
       badge.textContent = (data.provider + " · " + (data.model || "")).toUpperCase();
     }

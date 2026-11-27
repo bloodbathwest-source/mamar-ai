@@ -6,8 +6,8 @@ Run it with::
 
 Endpoints:
     GET  /            the chat page
-    GET  /api/health  status, provider, mode (demo/live), model
-    POST /api/chat    {message, session_id?} -> {reply, session_id, mode}
+    GET  /api/health  status, provider, brain (local/live/demo), model
+    POST /api/chat    {message, session_id?} -> {reply, session_id, brain, mode}
     POST /api/reset   {session_id} -> clears that session's memory
 """
 
@@ -44,12 +44,19 @@ def build_router(brain: Brain, store: SessionStore, persona: str,
                  settings: Settings) -> APIRouter:
     router = APIRouter(prefix="/api")
 
+    def brain_kind() -> str:
+        """local = brain on this machine (Ollama); live = cloud; demo."""
+        if brain.name == "demo":
+            return "demo"
+        return "local" if settings.local else "live"
+
     @router.get("/health")
     def health() -> dict:
         return {
             "status": "ok",
             "name": "MAMAR",
             "provider": settings.provider,
+            "brain": brain_kind(),
             "mode": "live" if brain.name != "demo" else "demo",
             "model": settings.effective_model if brain.name != "demo" else None,
         }
@@ -72,6 +79,7 @@ def build_router(brain: Brain, store: SessionStore, persona: str,
         return {
             "reply": reply,
             "session_id": session_id,
+            "brain": brain_kind(),
             "mode": "live" if brain.name != "demo" else "demo",
         }
 
