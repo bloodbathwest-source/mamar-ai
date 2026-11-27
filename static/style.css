@@ -75,7 +75,7 @@ header {
   color: var(--danger);
 }
 
-#reset-btn {
+#reset-btn, #voice-btn {
   background: none;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -85,7 +85,16 @@ header {
   font-size: 0.8rem;
 }
 
-#reset-btn:hover { color: var(--text); border-color: var(--dim); }
+#reset-btn:hover, #voice-btn:hover { color: var(--text); border-color: var(--dim); }
+
+/* Jarvis v1 — voice on means JARVIS MODE */
+.badge.jarvis {
+  border-color: var(--neon);
+  color: var(--neon);
+  box-shadow: 0 0 10px rgba(255, 46, 166, 0.35);
+}
+
+#voice-btn.on { color: var(--neon); border-color: var(--neon); }
 
 #messages {
   flex: 1;
@@ -173,3 +182,20 @@ header {
 }
 
 #composer button:disabled { opacity: 0.45; cursor: wait; box-shadow: none; }
+
+/* Jarvis v1 — the mic sits in the composer, quiet until it listens */
+#composer #mic-btn {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  box-shadow: none;
+  padding: 0.7rem 0.85rem;
+  font-size: 1.05rem;
+}
+
+#composer #mic-btn:hover { border-color: var(--dim); }
+
+#composer #mic-btn.listening {
+  border-color: var(--danger);
+  box-shadow: 0 0 12px rgba(255, 84, 112, 0.55);
+  animation: blink 1.1s infinite;
+}

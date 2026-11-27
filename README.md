@@ -75,6 +75,49 @@ but not running, she says that instead of quietly dropping into demo.
 
 ---
 
+## Jarvis v1 — voice + hands 🎙️
+
+VEGA with a voice and a small set of hands, in the shape of a certain
+movie butler: **voice + brain + tools**, all in the browser + this app.
+
+**Voice in.** Tap the 🎤 button in the message box and talk. This uses
+the browser's built-in speech recognition (the Web Speech API) — no
+server speech-to-text, no new dependencies. It works in **Chrome and
+Edge**; in a browser without it, the mic button says so instead of
+failing quietly. The words land in the message box and send like typing.
+Typing always works — voice is an extra, never a requirement.
+
+**Voice out.** The **🔊 voice** toggle in the header makes VEGA speak
+her replies aloud (browser speech synthesis, a suitable English voice
+picked automatically). While it's on, a **JARVIS MODE** badge lights up
+next to her status. The choice is remembered between visits.
+
+**Hands (tools).** With a tool-capable brain wired in, VEGA can call
+three read-only tools mid-conversation (`app/tools.py`):
+
+| Tool | What it does |
+|---|---|
+| `get_current_datetime` | The current date and time (Christian's timezone by default) |
+| `get_project_todos` | His project to-do summary — read from `project_todos.json`, a **static snapshot** maintained by hand, and labelled as one |
+| `get_system_status` | Which brain she is running on (the same payload as `/api/health`) |
+
+Function calling works over the same OpenAI-compatible adapter, so
+OpenAI, xAI, **and local Ollama** (`llama3.1:8b` supports tools) all get
+hands the same way. Tools fail safe: a glitch returns a friendly error
+to the brain, never a stack trace — and **demo mode never fakes tool
+results**: with no live brain, tools return a "connect a brain" note
+instead of data. If a model can't do function calling at all, chat
+still works and her reply notes that her hands are off with that brain.
+
+**Honest limits of v1.** No wake word — you tap the mic, she doesn't
+listen in the background. Speech recognition is the browser's (in
+Chrome that's Google's service, so voice input needs the internet even
+with a local brain; speech *output* is fully local). The to-do list is
+a snapshot, not a live feed. And the tools are read-only: she can look,
+not touch. Calendar, email, and smart-home hands are future work.
+
+---
+
 ## Run her brain locally (free, offline) 🖥️
 
 The third option: no cloud, no key, no bills. [Ollama](https://ollama.com)
@@ -138,11 +181,13 @@ ones the open model's makers built into the model itself.
 app/
   main.py     FastAPI app factory + routes (/, /api/chat, /api/health, /api/reset)
   brain.py    The adapter layer: one interface, OpenAI-compatible + demo brains
+  tools.py    Jarvis v1 hands: the tool registry (time, project to-dos, status)
   config.py   Settings from environment variables
   persona.py  Loads persona.md as the system prompt
   memory.py   Per-session conversation history in data/sessions.json
-static/       The chat page (plain HTML/CSS/JS, no build step)
+static/       The chat page (plain HTML/CSS/JS, no build step; mic + voice built in)
 persona.md    VEGA's personality — edit this to change who she is
+project_todos.json  Hand-maintained snapshot of Christian's projects (the to-do tool reads it)
 tests/        pytest suite (no network, no real key needed)
 data/         Her memory file lives here at runtime (gitignored)
 ```
@@ -155,8 +200,12 @@ pytest
 
 Covers the health endpoint, demo-mode replies, persona loading, session
 memory (two turns remember context; reset forgets), the adapter's
-request shape against a mocked provider, and the local Ollama brain
-(keyless selection, no auth header, friendly error when Ollama is down).
+request shape against a mocked provider, the local Ollama brain
+(keyless selection, no auth header, friendly error when Ollama is down),
+and the Jarvis v1 tool layer: each tool's contract, fail-safe errors,
+demo mode returning notes instead of data, and the brain's tool-calling
+loop (including the no-function-calling fallback) against mocked
+providers.
 
 ---
 

@@ -4,10 +4,14 @@ VEGA does not contain a model. Her *interface* (this app: chat page,
 persona, memory) is hers; her *brain* is rented from a provider API.
 Every brain implements one method::
 
-    reply(messages: list[dict]) -> str
+    reply(messages, tools=None, tool_runner=None) -> str
 
 ``messages`` is the OpenAI-style list: system prompt first, then the
-conversation history, then the newest user message.
+conversation history, then the newest user message. ``tools`` /
+``tool_runner`` are the Jarvis v1 hands (see ``app/tools.py``): tool
+definitions in OpenAI function-calling format, plus a callable the
+brain invokes when the model asks for a tool. Brains that can't call
+tools ignore both.
 
 Two implementations:
 
@@ -23,6 +27,9 @@ Two implementations:
 """
 
 from __future__ import annotations
+
+import json
+from typing import Callable
 
 import httpx
 
@@ -43,12 +50,38 @@ class BrainError(Exception):
     """The provider call failed; the message is safe to show the user."""
 
 
+class _ToolsRejected(Exception):
+    """The provider refused the request because it carried tools.
+
+    Some models behind an OpenAI-compatible API can't do function
+    calling and answer HTTP 400 when ``tools`` is present. The brain
+    catches this and retries without tools, so chat still works.
+    """
+
+
+# How many tool rounds one reply may take before the brain gives up —
+# a model that keeps asking for tools forever must not loop forever.
+MAX_TOOL_ROUNDS = 5
+
+TOOLS_UNSUPPORTED_NOTE = (
+    "(House note: this brain doesn't do tool-calling, so my hands are "
+    "off with it — connect a tool-capable model, like gpt-4o-mini, "
+    "grok-4, or llama3.1, and I can check the time, Christian's project "
+    "list, and my own status mid-conversation.)"
+)
+
+
 class Brain:
     """Interface every brain implements."""
 
     name = "base"
 
-    def reply(self, messages: list[dict]) -> str:  # pragma: no cover
+    def reply(
+        self,
+        messages: list[dict],
+        tools: list[dict] | None = None,
+        tool_runner: Callable[[str, dict], str] | None = None,
+    ) -> str:  # pragma: no cover
         raise NotImplementedError
 
 
@@ -70,7 +103,14 @@ class DemoBrain(Brain):
     def __init__(self) -> None:
         self._turn = 0
 
-    def reply(self, messages: list[dict]) -> str:
+    def reply(
+        self,
+        messages: list[dict],
+        tools: list[dict] | None = None,
+        tool_runner: Callable[[str, dict], str] | None = None,
+    ) -> str:
+        # Canned lines never call tools — demo mode must not fake
+        # tool results (see app/tools.py for the matching gate).
         line = self._LINES[self._turn % len(self._LINES)]
         self._turn += 1
         return f"{DEMO_LABEL} {line}"
@@ -109,9 +149,70 @@ class OpenAICompatibleBrain(Brain):
         # malformed one can crash client construction outright.
         self._trust_env = trust_env
 
-    def reply(self, messages: list[dict]) -> str:
+    def reply(
+        self,
+        messages: list[dict],
+        tools: list[dict] | None = None,
+        tool_runner: Callable[[str, dict], str] | None = None,
+    ) -> str:
+        """One reply — with a tool-calling loop when tools are wired.
+
+        When the model answers with ``tool_calls`` instead of text,
+        each call is run through ``tool_runner`` and the JSON result
+        goes back to the model as a ``tool`` message, until the model
+        produces text (or ``MAX_TOOL_ROUNDS`` is hit). If the provider
+        rejects the tools outright (HTTP 400 — a model without
+        function calling), the request is retried bare: chat still
+        works, and the reply carries a note that her hands are off
+        with this brain.
+        """
+        use_tools = bool(tools) and tool_runner is not None
+        tools_rejected = False
+        convo = list(messages)
+        for _round in range(MAX_TOOL_ROUNDS + 1):
+            payload: dict = {"model": self.model, "messages": convo}
+            if use_tools:
+                payload["tools"] = tools
+            try:
+                message = self._complete(payload)
+            except _ToolsRejected:
+                # Start the turn over, bare: a model that refuses tools
+                # may also choke on the tool messages already exchanged.
+                use_tools = False
+                tools_rejected = True
+                convo = list(messages)
+                continue
+            tool_calls = message.get("tool_calls") or []
+            if not tool_calls:
+                text = message.get("content") or ""
+                if tools_rejected:
+                    text = f"{text}\n\n{TOOLS_UNSUPPORTED_NOTE}".strip()
+                return text
+            convo.append(message)  # the assistant turn carrying the calls
+            for call in tool_calls:
+                fn = call.get("function") or {}
+                try:
+                    args = json.loads(fn.get("arguments") or "{}")
+                except (ValueError, TypeError):
+                    args = {}
+                if not isinstance(args, dict):
+                    args = {}
+                result = tool_runner(str(fn.get("name") or ""), args)
+                convo.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": call.get("id", ""),
+                        "content": result,
+                    }
+                )
+        raise BrainError(
+            "I got tangled in my own tool calls — too many rounds "
+            "without an answer. Ask me again, simpler."
+        )
+
+    def _complete(self, payload: dict) -> dict:
+        """POST one chat-completions request; return the message dict."""
         url = f"{self.base_url}/chat/completions"
-        payload = {"model": self.model, "messages": messages}
         headers = {"Content-Type": "application/json"}
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
@@ -124,6 +225,8 @@ class OpenAICompatibleBrain(Brain):
                 response = client.post(url, json=payload, headers=headers)
                 response.raise_for_status()
         except httpx.HTTPStatusError as exc:
+            if "tools" in payload and exc.response.status_code == 400:
+                raise _ToolsRejected from exc
             raise BrainError(
                 f"my provider ({self.name}) answered with an error: "
                 f"HTTP {exc.response.status_code}. Check the API key and "
@@ -142,7 +245,7 @@ class OpenAICompatibleBrain(Brain):
                 "Check the network and VEGA_BASE_URL."
             ) from exc
         try:
-            return response.json()["choices"][0]["message"]["content"]
+            return response.json()["choices"][0]["message"]
         except (ValueError, KeyError, IndexError, TypeError) as exc:
             raise BrainError(
                 f"my provider ({self.name}) sent back a reply I couldn't "

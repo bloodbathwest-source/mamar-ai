@@ -12,7 +12,9 @@
       <div class="logo">VEGA</div>
       <div class="tagline">named for the brightest star in Lyra</div>
       <div class="header-right">
+        <span id="jarvis-badge" class="badge jarvis hidden">JARVIS MODE</span>
         <span id="mode-badge" class="badge">…</span>
+        <button id="voice-btn" type="button" title="VEGA speaks her replies aloud">🔇 voice</button>
         <button id="reset-btn" type="button" title="Forget this conversation">↺ reset</button>
       </div>
     </header>
@@ -22,8 +24,9 @@
     <div id="typing" class="typing hidden"><span></span><span></span><span></span></div>
 
     <form id="composer">
+      <button id="mic-btn" type="button" title="Talk to VEGA (voice input)">🎤</button>
       <input id="input" type="text" placeholder="Talk to VEGA…" autocomplete="off" autofocus>
-      <button type="submit">Send</button>
+      <button id="send-btn" type="submit">Send</button>
     </form>
   </div>
   <script src="/static/app.js"></script>
