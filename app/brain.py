@@ -1,6 +1,6 @@
-"""MAMAR's brain — an adapter layer over AI provider APIs.
+"""VEGA's brain — an adapter layer over AI provider APIs.
 
-MAMAR does not contain a model. Her *interface* (this app: chat page,
+VEGA does not contain a model. Her *interface* (this app: chat page,
 persona, memory) is hers; her *brain* is rented from a provider API.
 Every brain implements one method::
 
@@ -134,12 +134,12 @@ class OpenAICompatibleBrain(Brain):
                 raise BrainError(self._unreachable_message) from exc
             raise BrainError(
                 f"I couldn't reach my provider ({self.name}): {exc}. "
-                "Check the network and MAMAR_BASE_URL."
+                "Check the network and VEGA_BASE_URL."
             ) from exc
         except httpx.HTTPError as exc:
             raise BrainError(
                 f"I couldn't reach my provider ({self.name}): {exc}. "
-                "Check the network and MAMAR_BASE_URL."
+                "Check the network and VEGA_BASE_URL."
             ) from exc
         try:
             return response.json()["choices"][0]["message"]["content"]

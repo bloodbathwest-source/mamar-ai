@@ -1,4 +1,4 @@
-"""MAMAR's web app — FastAPI factory + routers.
+"""VEGA's web app — FastAPI factory + routers.
 
 Run it with::
 
@@ -54,7 +54,7 @@ def build_router(brain: Brain, store: SessionStore, persona: str,
     def health() -> dict:
         return {
             "status": "ok",
-            "name": "MAMAR",
+            "name": "VEGA",
             "provider": settings.provider,
             "brain": brain_kind(),
             "mode": "live" if brain.name != "demo" else "demo",
@@ -103,7 +103,7 @@ def create_app(
     store = store if store is not None else SessionStore(DEFAULT_DATA_FILE)
     persona = persona if persona is not None else load_persona()
 
-    app = FastAPI(title="MAMAR", version="1.0.0")
+    app = FastAPI(title="VEGA", version="1.0.0")
     app.include_router(build_router(brain, store, persona, settings))
 
     @app.get("/")

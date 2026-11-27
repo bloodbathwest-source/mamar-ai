@@ -1,4 +1,4 @@
-// MAMAR chat page — plain JS, no build step.
+// VEGA chat page — plain JS, no build step.
 "use strict";
 
 const messagesEl = document.getElementById("messages");
@@ -9,7 +9,7 @@ const sendBtn = form.querySelector("button");
 const badge = document.getElementById("mode-badge");
 const resetBtn = document.getElementById("reset-btn");
 
-let sessionId = localStorage.getItem("mamar-session") || null;
+let sessionId = localStorage.getItem("vega-session") || null;
 
 function addMessage(role, text) {
   const div = document.createElement("div");
@@ -54,7 +54,7 @@ form.addEventListener("submit", async (event) => {
     });
     const data = await res.json();
     sessionId = data.session_id;
-    localStorage.setItem("mamar-session", sessionId);
+    localStorage.setItem("vega-session", sessionId);
     addMessage("assistant", data.reply);
   } catch {
     addMessage("assistant", "⚠️ I couldn't reach my own server. Is it still running?");
@@ -76,10 +76,10 @@ resetBtn.addEventListener("click", async () => {
     } catch { /* forgetting locally is enough */ }
   }
   sessionId = null;
-  localStorage.removeItem("mamar-session");
+  localStorage.removeItem("vega-session");
   messagesEl.innerHTML = "";
   addMessage("assistant", "Memory wiped. Fresh slate — who are you, and what are we doing?");
 });
 
 loadBadge();
-addMessage("assistant", "MAMAR online. Talk to me.");
+addMessage("assistant", "VEGA online. Talk to me.");

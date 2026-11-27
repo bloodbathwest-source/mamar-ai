@@ -1,4 +1,4 @@
-"""MAMAR — Christian's personal AI assistant, rebuilt as real code."""
+"""VEGA — Christian's personal AI assistant, rebuilt as real code."""
 
 from .main import create_app
 

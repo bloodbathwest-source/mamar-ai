@@ -1,6 +1,6 @@
 # ============================================================
-#  MAMAR — secrets shield
-#  This repo is PUBLIC, and MAMAR is wired to five paid API
+#  VEGA — secrets shield
+#  This repo is PUBLIC, and VEGA is wired to five paid API
 #  services (Tavily, OpenAI, xAI, Anthropic, ElevenLabs).
 #  If a real API key is ever committed here, anyone on the
 #  internet can find it and spend Christian's money.
@@ -57,7 +57,7 @@ desktop.ini
 
 # ---- Rebuild (Python) additions ----
 
-# MAMAR's conversation memory lives here — private chats, never commit
+# VEGA's conversation memory lives here — private chats, never commit
 data/
 
 # Python noise

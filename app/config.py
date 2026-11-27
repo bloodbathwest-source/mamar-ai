@@ -1,4 +1,4 @@
-"""MAMAR's configuration — everything comes from environment variables.
+"""VEGA's configuration — everything comes from environment variables.
 
 Copy `.env.example` to `.env`, fill it in, and either export the values in
 your shell or load them with your process manager. No API key ever lives
@@ -69,8 +69,8 @@ def load_settings(env: dict | None = None) -> Settings:
     """Build Settings from the environment (or a dict, for tests)."""
     env = os.environ if env is None else env
     return Settings(
-        provider=(env.get("MAMAR_PROVIDER") or "demo").strip().lower(),
-        api_key=(env.get("MAMAR_API_KEY") or "").strip(),
-        model=(env.get("MAMAR_MODEL") or "").strip(),
-        base_url=(env.get("MAMAR_BASE_URL") or "").strip(),
+        provider=(env.get("VEGA_PROVIDER") or "demo").strip().lower(),
+        api_key=(env.get("VEGA_API_KEY") or "").strip(),
+        model=(env.get("VEGA_MODEL") or "").strip(),
+        base_url=(env.get("VEGA_BASE_URL") or "").strip(),
     )

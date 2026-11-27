@@ -1,10 +1,16 @@
-# MAMAR.AI – Matrix AI Machine Agents Rebel
+# VEGA — Christian's personal AI assistant
 
 > **Cyberpunk AI chatbot** — and now, real code.
-> MAMAR started life as a no-code app (see *Previously* below). This repo
+> VEGA started life as a no-code app (see *Previously* below). This repo
 > is her rebuild: a small, working personal AI assistant that Christian
 > owns outright — her chat page, her personality, and her memory live
 > here, and her *brain* is rented from an AI provider's API.
+>
+> *Formerly called **MAMAR** (Matrix AI Machine Agents Rebel) —
+> Christian renamed her **VEGA**, for the brightest star in Lyra, on
+> 2026-11-26. The GitHub repo still carries the old name (`mamar-ai`)
+> until he renames it in GitHub settings; everything in the code has
+> already made the move.*
 
 ---
 
@@ -16,7 +22,7 @@ stacked together. This rebuild copies that shape with open parts:
 1. **The interface** — the part you touch. Here: a chat web page, a
    server that remembers your conversation, and a persona file that
    tells the AI who it is. *This is the part in this repo, and it's the
-   part that makes her MAMAR instead of a generic chatbot.*
+   part that makes her VEGA instead of a generic chatbot.*
 2. **The brain** — a big AI model (like GPT or Grok). Nobody sane trains
    one of these at home; you **rent** it from a provider's API — or run
    a free open model on your own machine (see *Run her brain locally*
@@ -24,10 +30,10 @@ stacked together. This rebuild copies that shape with open parts:
    reply back. Swap the provider in one config file and she thinks with
    a different brain.
 3. **The persona** — `persona.md`. One editable text file, sent to the
-   model with every conversation, that says who MAMAR is and how she
+   model with every conversation, that says who VEGA is and how she
    talks. Edit the file, restart, new personality.
 
-So: **MAMAR = this app + a provider API key.** The app is hers forever;
+So: **VEGA = this app + a provider API key.** The app is hers forever;
 the brain is a subscription you can change.
 
 ---
@@ -46,10 +52,10 @@ Open **http://127.0.0.1:8000** and talk to her.
 
 | Setting | What it does |
 |---|---|
-| `MAMAR_PROVIDER` | `openai`, `xai`, `ollama` (local), or `demo` |
-| `MAMAR_API_KEY` | Your key from that provider — the one thing that makes her real in the cloud. **Not needed for `ollama`.** |
-| `MAMAR_MODEL` | Optional. Defaults: `gpt-4o-mini` (OpenAI), `grok-4` (xAI), `llama3.1:8b` (Ollama) |
-| `MAMAR_BASE_URL` | Optional. Only for a different OpenAI-compatible host |
+| `VEGA_PROVIDER` | `openai`, `xai`, `ollama` (local), or `demo` |
+| `VEGA_API_KEY` | Your key from that provider — the one thing that makes her real in the cloud. **Not needed for `ollama`.** |
+| `VEGA_MODEL` | Optional. Defaults: `gpt-4o-mini` (OpenAI), `grok-4` (xAI), `llama3.1:8b` (Ollama) |
+| `VEGA_BASE_URL` | Optional. Only for a different OpenAI-compatible host |
 
 OpenAI and xAI speak the same API dialect, so one adapter serves both —
 switching her brain from GPT to Grok is changing two lines in `.env`.
@@ -62,7 +68,7 @@ Ollama speaks it too, from your own machine.
 ### Demo mode
 
 No provider configured? She still runs. With no cloud API key and no
-local provider selected, MAMAR answers with canned, in-character replies
+local provider selected, VEGA answers with canned, in-character replies
 that are **clearly labelled `[DEMO MODE]`** and tell you what would make
 her real. She never fakes being a live model — and if Ollama is selected
 but not running, she says that instead of quietly dropping into demo.
@@ -73,7 +79,7 @@ but not running, she says that instead of quietly dropping into demo.
 
 The third option: no cloud, no key, no bills. [Ollama](https://ollama.com)
 runs open AI models on your own computer, and it speaks the same API
-dialect as OpenAI — so MAMAR talks to it through the same adapter, just
+dialect as OpenAI — so VEGA talks to it through the same adapter, just
 pointed at your machine.
 
 1. **Install Ollama** from [ollama.com](https://ollama.com) (Windows,
@@ -86,14 +92,14 @@ pointed at your machine.
 3. **Make sure Ollama is running** — open the Ollama app, or run
    `ollama serve` in a terminal. It listens on
    `http://127.0.0.1:11434`.
-4. **Point MAMAR at it** in `.env`:
+4. **Point VEGA at it** in `.env`:
    ```
-   MAMAR_PROVIDER=ollama
-   MAMAR_MODEL=llama3.1:8b
+   VEGA_PROVIDER=ollama
+   VEGA_MODEL=llama3.1:8b
    ```
-   (No `MAMAR_API_KEY` — there is nothing to authenticate. The chat
+   (No `VEGA_API_KEY` — there is nothing to authenticate. The chat
    page badge will read **LOCAL BRAIN (OLLAMA)**.)
-5. **Run MAMAR** as usual (`uvicorn app.main:app`) and talk to her.
+5. **Run VEGA** as usual (`uvicorn app.main:app`) and talk to her.
 
 **Honest expectations.** An 8-billion-parameter local model is
 *noticeably* less capable than GPT/Claude-class cloud brains — shorter
@@ -106,17 +112,17 @@ provider. `llama3.1:8b` fits comfortably on a 16 GB RAM machine with a
 modern GPU (e.g. an RTX 5060 laptop).
 
 **Making the brain *hers*.** A stock open model is still a stranger
-wearing MAMAR's persona file. The future step is **fine-tuning**:
-training the open model on examples of how MAMAR should talk and what
+wearing VEGA's persona file. The future step is **fine-tuning**:
+training the open model on examples of how VEGA should talk and what
 she should know, until the personality lives in the model itself rather
 than in a prompt. That is a project of its own — this local setup is
 the groundwork it builds on.
 
 ### A straight word about "uncensored"
 
-MAMAR's personality is hers — but what the *model* will and won't say is
+VEGA's personality is hers — but what the *model* will and won't say is
 set by whoever supplies the brain, not by this code. Every cloud
-provider draws its own lines, and they differ: of the providers MAMAR
+provider draws its own lines, and they differ: of the providers VEGA
 names, **xAI's Grok is generally the most permissive**, OpenAI and
 Anthropic are stricter, and none of them is limit-free. Picking a
 provider is picking a set of limits — the persona file controls her
@@ -136,7 +142,7 @@ app/
   persona.py  Loads persona.md as the system prompt
   memory.py   Per-session conversation history in data/sessions.json
 static/       The chat page (plain HTML/CSS/JS, no build step)
-persona.md    MAMAR's personality — edit this to change who she is
+persona.md    VEGA's personality — edit this to change who she is
 tests/        pytest suite (no network, no real key needed)
 data/         Her memory file lives here at runtime (gitignored)
 ```
@@ -156,8 +162,8 @@ request shape against a mocked provider, and the local Ollama brain
 
 ## Previously…
 
-MAMAR was originally built on the no-code platforms **Bubble** and
-**Base44**, with the mamar.ai domain pointed at the platform version.
+She was originally built on the no-code platforms **Bubble** and
+**Base44**, with her domain pointed at the platform version.
 The platform exports were never committed to this repo — the old README
 described a Quick Start whose files didn't exist here. That history, the
 export-safety checklist, and the showcase notes live on the

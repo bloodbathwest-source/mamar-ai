@@ -1,4 +1,4 @@
-"""MAMAR's persona lives in `persona.md` at the project root.
+"""VEGA's persona lives in `persona.md` at the project root.
 
 That file *is* her personality — it is read at startup and sent to the
 model as the system prompt. Edit the file, restart, she's different.
@@ -12,7 +12,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_PERSONA_PATH = PROJECT_ROOT / "persona.md"
 
 FALLBACK_PERSONA = (
-    "You are MAMAR, a cyberpunk-flavoured personal AI assistant. "
+    "You are VEGA, a cyberpunk-flavoured personal AI assistant. "
     "Be sharp, direct, and helpful, and never fake a capability you do not have."
 )
 

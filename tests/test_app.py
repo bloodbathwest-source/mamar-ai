@@ -1,4 +1,4 @@
-"""Tests for the MAMAR rebuild — no network, no real API key."""
+"""Tests for the VEGA rebuild — no network, no real API key."""
 
 import json
 
@@ -37,14 +37,14 @@ def test_health_ok_in_demo_mode(client):
     assert res.status_code == 200
     body = res.json()
     assert body["status"] == "ok"
-    assert body["name"] == "MAMAR"
+    assert body["name"] == "VEGA"
     assert body["mode"] == "demo"
 
 
 def test_chat_page_is_served(client):
     res = client.get("/")
     assert res.status_code == 200
-    assert "MAMAR" in res.text
+    assert "VEGA" in res.text
 
 
 # -- demo mode --------------------------------------------------------------
@@ -71,8 +71,9 @@ def test_chat_without_session_id_gets_one(client):
 
 def test_persona_file_loads_and_names_her():
     text = load_persona()
-    assert "MAMAR" in text
-    assert "Matrix AI Machine Agents Rebel" in text
+    assert "VEGA" in text
+    assert "brightest star" in text
+    assert "Lyra" in text
 
 
 def test_persona_missing_file_falls_back(tmp_path):
@@ -188,7 +189,7 @@ def test_adapter_request_shape_and_reply_parsing():
 
 
 def test_ollama_is_live_with_no_api_key():
-    settings = load_settings({"MAMAR_PROVIDER": "ollama"})
+    settings = load_settings({"VEGA_PROVIDER": "ollama"})
     assert settings.live is True
     assert settings.local is True
     assert settings.api_key == ""
@@ -200,7 +201,7 @@ def test_ollama_is_live_with_no_api_key():
 
 
 def test_cloud_provider_without_key_stays_demo():
-    settings = load_settings({"MAMAR_PROVIDER": "openai"})
+    settings = load_settings({"VEGA_PROVIDER": "openai"})
     assert settings.live is False
     assert isinstance(build_brain(settings), DemoBrain)
 
@@ -219,7 +220,7 @@ def test_ollama_adapter_sends_no_auth_header():
         )
 
     brain = build_brain(
-        load_settings({"MAMAR_PROVIDER": "ollama"}),
+        load_settings({"VEGA_PROVIDER": "ollama"}),
         transport=httpx.MockTransport(handler),
     )
     reply = brain.reply([{"role": "user", "content": "hello"}])
@@ -235,7 +236,7 @@ def _ollama_down_transport(request: httpx.Request) -> httpx.Response:
 
 def test_ollama_unreachable_raises_friendly_error():
     brain = build_brain(
-        load_settings({"MAMAR_PROVIDER": "ollama"}),
+        load_settings({"VEGA_PROVIDER": "ollama"}),
         transport=httpx.MockTransport(_ollama_down_transport),
     )
     with pytest.raises(BrainError) as excinfo:
@@ -253,7 +254,7 @@ def test_ollama_ignores_proxy_environment(monkeypatch):
     # is the friendly BrainError — not an httpx.InvalidURL escaping.
     monkeypatch.setenv("HTTP_PROXY", "http://[::1")
     monkeypatch.setenv("HTTPS_PROXY", "http://[::1")
-    brain = build_brain(load_settings({"MAMAR_PROVIDER": "ollama"}))
+    brain = build_brain(load_settings({"VEGA_PROVIDER": "ollama"}))
     with pytest.raises(BrainError) as excinfo:
         brain.reply([{"role": "user", "content": "hello"}])
     assert "Ollama" in str(excinfo.value)
@@ -261,7 +262,7 @@ def test_ollama_ignores_proxy_environment(monkeypatch):
 
 def test_ollama_health_reports_local_brain(tmp_path):
     app = create_app(
-        settings=load_settings({"MAMAR_PROVIDER": "ollama"}),
+        settings=load_settings({"VEGA_PROVIDER": "ollama"}),
         store=SessionStore(tmp_path / "sessions.json"),
     )
     body = TestClient(app).get("/api/health").json()
@@ -273,11 +274,11 @@ def test_ollama_health_reports_local_brain(tmp_path):
 
 def test_ollama_down_chat_is_friendly_not_demo(tmp_path):
     brain = build_brain(
-        load_settings({"MAMAR_PROVIDER": "ollama"}),
+        load_settings({"VEGA_PROVIDER": "ollama"}),
         transport=httpx.MockTransport(_ollama_down_transport),
     )
     app = create_app(
-        settings=load_settings({"MAMAR_PROVIDER": "ollama"}),
+        settings=load_settings({"VEGA_PROVIDER": "ollama"}),
         brain=brain,
         store=SessionStore(tmp_path / "sessions.json"),
     )

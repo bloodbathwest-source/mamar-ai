@@ -1,8 +1,8 @@
 # Export Safety Checklist — read this BEFORE committing any Bubble / Base44 export
 
-This repo is **public**. MAMAR uses five paid API services — **Tavily, OpenAI,
-xAI, Anthropic, ElevenLabs** — and platform exports can quietly include the
-API keys for them. If a key is committed to a public repo, strangers can find
+This repo is **public**. The original no-code build was wired to five paid
+API services — **Tavily, OpenAI, xAI, Anthropic, ElevenLabs** — and
+platform exports can quietly include the API keys for them. If a key is committed to a public repo, strangers can find
 it (bots scan GitHub for keys within minutes) and run up bills on those
 accounts.
 
